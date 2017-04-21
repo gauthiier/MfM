@@ -1,0 +1,7 @@
+# python (byte-compiled, etc.)
+*.py[cod]
+__pycache__/
+
+# MfM (config, logs, etc.)
+config.in
+*.log

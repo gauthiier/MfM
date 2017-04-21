@@ -1,4 +1,4 @@
-import sys, os, time, json, logging
+import sys, os, subprocess, time, json, logging
 from optparse import OptionParser
 from uritools import uricompose
 
@@ -24,8 +24,11 @@ def parse_config(options):
 def vlc_error(event, data):
 	print event
 
-def run(options):	
+def run(options):
 
+	# volume (for rpi + hifiberry)
+	if sys.platform == 'linux2':
+		subprocess.call('pactl', 'set-sink-volume', '0', '45%')
 
 	url = uricompose(scheme='http', host=options.host, port=int(options.port), path='/'+options.mnt)
 

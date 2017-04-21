@@ -28,7 +28,7 @@ def run(options):
 
 	# volume (for rpi + hifiberry)
 	if sys.platform == 'linux2':
-		subprocess.call('pactl', 'set-sink-volume', '0', '45%')
+		subprocess.call(['pactl', 'set-sink-volume', '0', '45%'])
 
 	url = uricompose(scheme='http', host=options.host, port=int(options.port), path='/'+options.mnt)
 

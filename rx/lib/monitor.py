@@ -25,6 +25,8 @@ class Monitor:
 		if config is None or config.server is None:
 			raise Exception('No host specified in config file.')
 
+		self.end_lock = threading.Lock()
+
 	def register(self):
 
 		self._sb.addPublisher("monitor", "boolean")
@@ -46,7 +48,8 @@ class Monitor:
 
 	def state_signal(self, value):
 		print "---- state_signal ----"
-		self.STATE = bool(value)
+		with self.end_lock:
+			self.STATE = bool(value)
 
 	def monitor_signal(self, value):
 		print "++++ monitor_signal ++++"
@@ -55,6 +58,7 @@ class Monitor:
 		print self.EXIT
 
 	def thread_ends(self):
+		self.end_lock.acquire()
 		self.STATE = False
 
 	def thread_status(self, str_msg):
@@ -83,6 +87,7 @@ class Monitor:
 		if self.EXIT:
 			# exit transition
 			self.STATE = False
+			self.stop()
 			return ("state_exit", None)
 		elif not self.STATE:
 			# off transition
@@ -107,6 +112,7 @@ class Monitor:
 				print "thread already terminated..."
 			self._thread = None
 			self.emit("state", strbool(False))
+			self.end_lock.release()
 
 		# transit?
 		if self.EXIT:

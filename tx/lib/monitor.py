@@ -71,6 +71,7 @@ class Monitor:
 	def state_on(self, c):
 
 		print "state_on"
+		self.emit("state", strbool(True))
 
 		# on transition
 		if self.STATE and self._thread is None:
@@ -82,6 +83,7 @@ class Monitor:
 		if self.EXIT:
 			# exit transition
 			self.STATE = False
+			self.stop()
 			return ("state_exit", None)
 		elif not self.STATE:
 			# off transition
@@ -94,6 +96,7 @@ class Monitor:
 	def state_off(self, c):
 
 		print "state_off"
+		self.emit("state", strbool(False))
 
 		# on transition
 		if not self.STATE and self._thread is not None:
@@ -137,7 +140,7 @@ class Monitor:
 				m = StateMachine()
 				m.add_state("state_on", self.state_on)
 				m.add_state("state_off", self.state_off)
-				m.add_state("state_exit", None, end_state=1)
+				m.add_state("state_exit", self.stop, end_state=1)
 				m.set_start("state_off")
 				m.run(None)
 

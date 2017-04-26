@@ -150,6 +150,7 @@ class Monitor:
 					STATE = True
 					m.set_start("state_on")
 					time.sleep(2)
+					print "starting fsm state_on"
 				else:
 					m.set_start("state_off")
 				m.run(None)

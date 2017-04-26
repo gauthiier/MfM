@@ -79,7 +79,6 @@ class Monitor:
 
 		# on transition
 		if self.STATE and self._thread is None:
-			print "A"
 			self._thread = threading.Thread(target=self.run, args=(self.config, self.status_cb, self.ends_cb))
 			self._thread.start()
 			self.emit("state", strbool(True))
@@ -87,17 +86,14 @@ class Monitor:
 		# transit?
 		if self.EXIT:
 			# exit transition
-			print "B"
 			self.STATE = False
 			self.stop()
 			return ("state_exit", None)
 		elif not self.STATE:
 			# off transition
-			print "C"
 			return ("state_off", None)
 		else:
 			# on transition (re-entry)
-			print "D"
 			time.sleep(2)
 			return ("state_on", None)
 
@@ -151,11 +147,11 @@ class Monitor:
 				m.add_state("state_off", self.state_off)
 				m.add_state("state_exit", self.stop, end_state=1)
 				if fsm_start_state_on:
-					STATE = True
+					self.STATE = True
 					m.set_start("state_on")
 					print "fsm start state_on"
 				else:
-					STATE = False
+					self.STATE = False
 					m.set_start("state_off")
 					print "fsm start state_off"
 				m.run(None)

@@ -1,0 +1,22 @@
+#!/usr/bin/liquidsoap
+
+set("log.stdout",true)
+
+def out_config(c)
+        print("---tx config---")
+        print("host: "^c["host"])
+        print("port: "^c["port"])
+        print("mnt: "^c["mnt"])
+        print("usr: "^c["usr"])
+        print("pwd: "^c["pwd"])
+end
+
+file = get_process_output("cat config.in")
+config = of_json(default=[("key", "value")], file)
+
+out_config(config)
+
+set("frame.audio.size", 35280)
+input = input.alsa(device="hw:1,0", bufferize=false)
+output.icecast(%mp3, host=config["host"], port=8000, mount=config["mnt"], user=config["usr"], password=config["pwd"], input)
+#output.alsa(input, bufferize=false)

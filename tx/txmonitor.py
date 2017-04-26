@@ -1,21 +1,31 @@
-import os, threading, time, json, logging
+import os, platform, subprocess, time, json, logging
 from optparse import OptionParser
 from lib.monitor import Monitor
-import log, rx
+import log
+	   
+class TXMonitor(Monitor):
 
-class RXMonitor(Monitor):
+    p = None
 
-	def run(self, config, status_cb, ends_cb):
-		rx.run(options, status_cb, ends_cb)
+    def run(self, config, status_cb, ends_cb):
 
-	def stop(self):
-		rx.stop()
+        if platform.system() == 'Linux':
+            self.p = subprocess.Popen(['liquidsoap', 'tx.li'])
+        else:
+            self.p = subprocess.Popen(['sleep', '20'])
 
-def ends_callback():
-	rxmonitor.thread_ends()
+        sig = self.p.poll()
+        while sig is None:
+            sig = self.p.poll()
+            time.sleep(2)
+            self.thread_status('ON AIR')
 
-def status_callback(msg):
-	rxmonitor.thread_status(msg)
+        self.thread_status('OFF AIR')
+        self.thread_ends()
+
+    def stop(self):
+        if self.p is not None:
+            self.p.terminate()
 
 def parse_config(options):
 
@@ -54,5 +64,5 @@ if __name__ == "__main__":
     	p.print_help()
     	p.error('No mount point specified.')
 
-    rxmonitor = RXMonitor(name=options.name, config=options)
-    rxmonitor.monitor(status_callback, ends_callback)
+    txmonitor = TXMonitor(name=options.name, config=options)
+    txmonitor.monitor(None, None)

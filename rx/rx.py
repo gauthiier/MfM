@@ -2,15 +2,13 @@ import sys, os, subprocess, time, json, logging
 from optparse import OptionParser
 from uritools import uricompose
 
-import vlc
-
-reload(sys)
-sys.setdefaultencoding('utf8')
-
-logging.basicConfig(filename='rx.log', format='%(asctime)s -- RX/%(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+import lib.vlc as vlc
+import log
 
 SLEEP_sec = 3
-TIMOUT_STATUS_sec = 5 * 60
+TIMOUT_STATUS_sec = 1 * 60
+
+STOP = False
 
 def parse_config(options):
 
@@ -20,17 +18,23 @@ def parse_config(options):
 		options.port = c['port']
 		options.mnt = c['mnt']
 
-@vlc.callbackmethod
-def vlc_error(event, data):
-	print event
+def stop():
+	global STOP
+	STOP = True
 
-def run(options):
+def run(options, status_cb, exit_cb):
+
+	global STOP
 
 	# volume (for rpi + hifiberry)
 	if sys.platform == 'linux2':
 		subprocess.call(["amixer", "-D", "pulse", "sset", "Master", "45%"])
 
-	url = uricompose(scheme='http', host=options.host, port=int(options.port), path='/'+options.mnt)
+	def cb_status(status, status_cb):
+		if status_cb is not None:
+			status_cb(status)
+
+	url = uricompose(scheme='http', host=options.host, port=int(options.port), path=options.mnt)
 
 	vi = vlc.Instance()
 
@@ -44,19 +48,33 @@ def run(options):
 
 	time.sleep(SLEEP_sec)
 
+	logging.info(machine.get_state())
+	cb_status(str(machine.get_state()), status_cb)	
+
 	tick = 0
 	while machine.get_state() == vlc.State.Playing:
 		time.sleep(SLEEP_sec)
 		tick += SLEEP_sec
 		if tick > TIMOUT_STATUS_sec:
 			tick = 0
-			logging.info(machine.get_state())				
+			logging.info(machine.get_state())
+			cb_status(str(machine.get_state()), status_cb)
+		if STOP:
+			machine.stop()
+			STOP = False			
+			time.sleep(1)
+			break
 
 	if machine.get_state() == vlc.State.Error:
 		logging.error(machine.get_state())
+		cb_status(str(machine.get_state()), status_cb)
 	else:
 		logging.info(machine.get_state())
-	
+		cb_status(str(machine.get_state()), status_cb)
+
+	if exit_cb is not None:
+		exit_cb()
+
 
 if __name__ == "__main__":
 
@@ -85,6 +103,6 @@ if __name__ == "__main__":
 
     logging.info('start rx')
 
-    run(options)
+    run(options, None, None)
 
     logging.info('end rx \n\n')

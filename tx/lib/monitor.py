@@ -79,6 +79,7 @@ class Monitor:
 
 		# on transition
 		if self.STATE and self._thread is None:
+			print "A"
 			self._thread = threading.Thread(target=self.run, args=(self.config, self.status_cb, self.ends_cb))
 			self._thread.start()
 			self.emit("state", strbool(True))
@@ -86,14 +87,17 @@ class Monitor:
 		# transit?
 		if self.EXIT:
 			# exit transition
+			print "B"
 			self.STATE = False
 			self.stop()
 			return ("state_exit", None)
 		elif not self.STATE:
 			# off transition
+			print "C"
 			return ("state_off", None)
 		else:
 			# on transition (re-entry)
+			print "D"
 			time.sleep(2)
 			return ("state_on", None)
 

@@ -12,7 +12,8 @@ def strbool(bool):
 
 class Monitor:
 
-	EXIT = False	
+	EXIT = False
+	STATE = False
 	_thread = None
 	_sb = None
 
@@ -148,7 +149,6 @@ class Monitor:
 				if fsm_start_state_on:
 					STATE = True
 					m.set_start("state_on")
-					time.sleep(2)
 					print "fsm start state_on"
 				else:
 					STATE = False

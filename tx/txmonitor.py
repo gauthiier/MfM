@@ -65,4 +65,4 @@ if __name__ == "__main__":
     	p.error('No mount point specified.')
 
     txmonitor = TXMonitor(name=options.name, config=options)
-    txmonitor.monitor(None, None)
+    txmonitor.monitor(None, None, fsm_start_state_on=True)

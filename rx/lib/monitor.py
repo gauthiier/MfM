@@ -127,7 +127,7 @@ class Monitor:
 			time.sleep(2)
 			return ("state_off", None)
 
-	def monitor(self, status_cb, ends_cb):
+	def monitor(self, status_cb, ends_cb, fsm_start_state_on=False):
 
 		self._sb = spacebrew.Spacebrew(name=self.name, server=self.config.server)
 		self.register()
@@ -146,7 +146,12 @@ class Monitor:
 				m.add_state("state_on", self.state_on)
 				m.add_state("state_off", self.state_off)
 				m.add_state("state_exit", self.stop, end_state=1)
-				m.set_start("state_off")
+				if fsm_start_state_on:
+					STATE = True
+					m.set_start("state_on")
+					time.sleep(2)
+				else:
+					m.set_start("state_off")
 				m.run(None)
 
 		except Exception as e:

@@ -18,5 +18,5 @@ out_config(config)
 
 set("frame.audio.size", 35280)
 input = input.alsa(device="hw:1,0", bufferize=false)
-output.icecast(%mp3, host=config["host"], port=8000, mount=config["mnt"], user=config["usr"], password=config["pwd"], input)
+output.icecast(%mp3, host=config["host"], port=int_of_string(config["port"]), mount=config["mnt"], user=config["usr"], password=config["pwd"], input)
 #output.alsa(input, bufferize=false)

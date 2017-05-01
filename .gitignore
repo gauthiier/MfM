@@ -5,3 +5,4 @@ __pycache__/
 # MfM (config, logs, etc.)
 config.in
 *.log
+*.conf

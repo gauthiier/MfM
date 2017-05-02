@@ -1,7 +1,8 @@
 import os, threading, time, json, logging
 from optparse import OptionParser
 from lib.monitor import Monitor
-import log, rx
+import lib.log as log
+import rx
 
 class RXMonitor(Monitor):
 
@@ -54,5 +55,9 @@ if __name__ == "__main__":
     	p.print_help()
     	p.error('No mount point specified.')
 
+    log.info("[rxmonitor] start - " + options.name)
+
     rxmonitor = RXMonitor(name=options.name, config=options)
     rxmonitor.monitor(status_callback, ends_callback)
+
+    log.info("[rxmonitor] end")

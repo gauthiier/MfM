@@ -1,9 +1,8 @@
 import sys, os, subprocess, time, json, logging
 from optparse import OptionParser
 from uritools import uricompose
-
 import lib.vlc as vlc
-import log
+import lib.log as log
 
 SLEEP_sec = 3
 TIMOUT_STATUS_sec = 1 * 60
@@ -42,13 +41,13 @@ def run(options, status_cb, exit_cb):
 	machine = vi.media_player_new()
 	machine.set_media(stream)
 
-	logging.info('open ' + url)
+	log.info('[rx] open ' + url)
 
 	status = machine.play()
 
 	time.sleep(SLEEP_sec)
 
-	logging.info(machine.get_state())
+	log.info("[rx] " + str(machine.get_state()))
 	cb_status(str(machine.get_state()), status_cb)	
 
 	tick = 0
@@ -57,7 +56,7 @@ def run(options, status_cb, exit_cb):
 		tick += SLEEP_sec
 		if tick > TIMOUT_STATUS_sec:
 			tick = 0
-			logging.info(machine.get_state())
+			log.info("[rx] " + str(machine.get_state()))
 			cb_status(str(machine.get_state()), status_cb)
 		if STOP:
 			machine.stop()
@@ -66,10 +65,10 @@ def run(options, status_cb, exit_cb):
 			break
 
 	if machine.get_state() == vlc.State.Error:
-		logging.error(machine.get_state())
+		log.err("[rx] " + str(machine.get_state()))
 		cb_status(str(machine.get_state()), status_cb)
 	else:
-		logging.info(machine.get_state())
+		log.info("[rx] " + str(machine.get_state()))
 		cb_status(str(machine.get_state()), status_cb)
 
 	if exit_cb is not None:
@@ -101,8 +100,8 @@ if __name__ == "__main__":
     	p.print_help()
     	p.error('No mount point specified.')
 
-    logging.info('start rx')
+    log.info('[rx] start')
 
     run(options, None, None)
 
-    logging.info('end rx \n\n')
+    log.info('[rx] end')

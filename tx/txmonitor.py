@@ -1,7 +1,7 @@
-import os, platform, subprocess, time, json, logging
+import os, platform, subprocess, time, json, logging, time
 from optparse import OptionParser
 from lib.monitor import Monitor
-import log
+import lib.log as log
 	   
 class TXMonitor(Monitor):
 
@@ -46,6 +46,7 @@ if __name__ == "__main__":
     p.add_option('-m', '--mnt', action="store", help="mount point")
     p.add_option('-n', '--name', action="store", help="name of the rx monitor")
     p.add_option('-s', '--server', action="store", help="sb server address")
+    p.add_option('-d', '--delay', action="store", help="delay before starting (in sec)", default=None)
 
     options, args = p.parse_args()
 
@@ -64,5 +65,13 @@ if __name__ == "__main__":
     	p.print_help()
     	p.error('No mount point specified.')
 
+    log.info("[txmonitor] start - " + options.name)
+
+    if options.delay:
+        log.info("[txmonitor] delay " + options.delay)
+        time.sleep(int(options.delay))
+
     txmonitor = TXMonitor(name=options.name, config=options)
     txmonitor.monitor(None, None, fsm_start_state_on=True)
+
+    log.info("[txmonitor] end - " + options.name)

@@ -1,6 +1,7 @@
 import threading, time, logging, traceback
 from pySpacebrew import spacebrew
 from fsm import StateMachine
+import log
 
 def bool(str):
 	return str == 'true'
@@ -47,13 +48,12 @@ class Monitor:
 			pass
 
 	def state_signal(self, value):
-		print "---- state_signal ----"
+		log.info(self.idstr() + " state_signal - " + str(value))		
 		with self.end_lock:
 			self.STATE = bool(value)
 
 	def monitor_signal(self, value):
-		print "++++ monitor_signal ++++"
-		print value
+		log.info(self.idstr() + " monitor_signal - " + str(value))
 		self.EXIT = bool(value)
 		print self.EXIT
 
@@ -64,17 +64,17 @@ class Monitor:
 	def thread_status(self, str_msg):
 		self.emit("status", str_msg)
 
-	def run(self, config, status_cb, ends_cb):
-		print "override this (parent) function - run"
+	# override this (parent) function - run
+	def run(self, config, status_cb, ends_cb):		
 		time.sleep(2)
 
-	def stop(self):
-		print "override this (parent) function - stop"		
+	# print "override this (parent) function - stop
+	def stop(self):		
 		time.sleep(2)
 
 	def state_on(self, c):
 
-		print "state_on"
+		log.info(self.idstr() + " state_on")
 		self.emit("state", strbool(True))
 
 		# on transition
@@ -99,17 +99,19 @@ class Monitor:
 
 	def state_off(self, c):
 
-		print "state_off"
+		log.info(self.idstr() + " state_off")
 		self.emit("state", strbool(False))
 
 		# on transition
 		if not self.STATE and self._thread is not None:
 			if self._thread.is_alive():
-				print "thread still alive..."
+				log.info(self.idstr() + " thread still alive...")
+				log.info(self.idstr() + " stop & join...")
 				self.stop()
 				self._thread.join()
 			else:
-				print "thread already terminated..."
+				log.info(self.idstr() + "thread already terminated...")
+			log.info(self.idstr() + "thread exited")
 			self._thread = None
 			self.emit("state", strbool(False))
 			self.end_lock.release()
@@ -127,18 +129,30 @@ class Monitor:
 			time.sleep(2)
 			return ("state_off", None)
 
+	def idstr(self):
+		return "[monitor/" + self.name + "]"
+
 	def monitor(self, status_cb, ends_cb, fsm_start_state_on=False):
 
+		log.info(self.idstr() + " start")		
+
 		self._sb = spacebrew.Spacebrew(name=self.name, server=self.config.server)
+
+		log.info(self.idstr() + " registering spacebrew")
+
 		self.register()
 
 		self.status_cb = status_cb
 		self.ends_cb = ends_cb
 
 		try:
+			log.info(self.idstr() + " start spacebrew")
+
 			self._sb.start()
 
 			while not self.EXIT:
+
+				log.info(self.idstr() + " monitor loop/alive")
 
 				self.emit("monitor", strbool(True))
 
@@ -157,12 +171,12 @@ class Monitor:
 				m.run(None)
 
 		except Exception as e:
-			print e
-			print traceback.format_exc()
+			log.err(traceback.format_exc())
 		finally:
-			print "Exiting"
+			log.info(self.idstr() + " end spacebrew")
 			self._sb.stop()
 			self.emit("monitor", False)
+			log.info(self.idstr() + " end")
 
 
 

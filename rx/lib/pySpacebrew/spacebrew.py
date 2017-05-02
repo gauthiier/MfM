@@ -89,6 +89,7 @@ class Spacebrew(object):
 		self.on_close(ws)
 
 	def on_close(self, ws):
+		logging.info("Closing brew.")
 		self.connected = False
 		while self.started and not self.connected:
 			time.sleep(5)
@@ -127,7 +128,6 @@ class Spacebrew(object):
 		self.started = False
 		if self.ws is not None:
 			self.ws.close()
-		print "sb -- stop..."
 		self.thread.join()
 
 if __name__ == "__main__":

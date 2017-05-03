@@ -52,10 +52,6 @@ def handle_SIGQUIT(signum, frame):
     log.info("--------------------------------> handle_SIGQUIT")
     rxmonitor.exit() 
 
-def handle_CTRL_C_EVENT(signum, frame):
-    log.info("--------------------------------> CTRL_C_EVENT")
-    rxmonitor.exit() 
-
 
 if __name__ == "__main__":
 
@@ -90,7 +86,6 @@ if __name__ == "__main__":
     signal.signal(signal.SIGHUP, handle_SIGHUP)
     #signal.signal(signal.SIGKILL, handle_SIGKILL)
     signal.signal(signal.SIGQUIT, handle_SIGQUIT)
-    signal.signal(signal.CTRL_C_EVENT, handle_CTRL_C_EVENT)
 
     log.info("[rxmonitor] start - " + options.name)
 

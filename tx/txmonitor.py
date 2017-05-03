@@ -35,7 +35,32 @@ def parse_config(options):
 		options.port = c['port']
 		options.mnt = c['mnt']
 		options.name = c['name']
-		options.server = c['server']	
+		options.server = c['server']
+
+def handle_SIGTERM(signum, frame):
+    log.info("--------------------------------> handle_SIGTERM")
+    txmonitor.exit() 
+
+def handle_SIGINT(signum, frame):
+    log.info("--------------------------------> handle_SIGINT") 
+    txmonitor.exit()
+
+def handle_SIGSTOP(signum, frame):
+    log.info("--------------------------------> handle_SIGSTOP")    
+    txmonitor.exit() 
+
+def handle_SIGHUP(signum, frame):
+    log.info("--------------------------------> handle_SIGHUP") 
+    txmonitor.exit() 
+
+def handle_SIGKILL(signum, frame):
+    log.info("--------------------------------> handle_SIGKILL")
+    txmonitor.exit()    
+
+def handle_SIGQUIT(signum, frame):
+    log.info("--------------------------------> handle_SIGQUIT")
+    txmonitor.exit() 
+
 
 if __name__ == "__main__":
 
@@ -64,6 +89,13 @@ if __name__ == "__main__":
     if options.mnt is None:
     	p.print_help()
     	p.error('No mount point specified.')
+
+    signal.signal(signal.SIGTERM, handle_SIGTERM)
+    signal.signal(signal.SIGINT, handle_SIGINT)
+    #signal.signal(signal.SIGSTOP, handle_SIGSTOP)
+    signal.signal(signal.SIGHUP, handle_SIGHUP)
+    #signal.signal(signal.SIGKILL, handle_SIGKILL)
+    signal.signal(signal.SIGQUIT, handle_SIGQUIT)        
 
     log.info("[txmonitor] start - " + options.name)
 

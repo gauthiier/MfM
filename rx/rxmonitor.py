@@ -29,22 +29,22 @@ def parse_config(options):
 		options.server = c['server']	
 
 def handle_SIGTERM(signum, frame):
-    print "handle_SIGTERM"
+    log.info("--------------------------------> handle_SIGTERM")    
 
 def handle_SIGINT(signum, frame):
-    print "handle_SIGINT"
+    log.info("--------------------------------> handle_SIGINT") 
 
 def handle_SIGSTOP(signum, frame):
-    print "handle_SIGSTOP"
+    log.info("--------------------------------> handle_SIGSTOP")    
 
 def handle_SIGHUP(signum, frame):
-    print "handle_SIGHUP"
+    log.info("--------------------------------> handle_SIGHUP") 
 
 def handle_SIGKILL(signum, frame):
-    print "handle_SIGKILL"
+    log.info("--------------------------------> handle_SIGKILL")    
 
 def handle_SIGQUIT(signum, frame):
-    print "handle_SIGKILL"    
+    log.info("--------------------------------> handle_SIGKILL"    )    
 
 
 

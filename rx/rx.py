@@ -26,8 +26,8 @@ def run(options, status_cb, exit_cb):
 	global STOP
 
 	# volume (for rpi + hifiberry)
-	if sys.platform == 'linux2':
-		subprocess.call(["amixer", "-D", "pulse", "sset", "Master", "45%"])
+	# if sys.platform == 'linux2':
+	# 	subprocess.call(["amixer", "-D", "pulse", "sset", "Master", "45%"])
 
 	def cb_status(status, status_cb):
 		if status_cb is not None:

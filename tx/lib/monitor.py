@@ -91,6 +91,23 @@ class Monitor:
 	def stop(self):		
 		time.sleep(2)
 
+	def kill(self):
+		self.EXIT = True
+
+	def terminate(self):
+		if self._thread is not None and self._thread.is_alive():
+			log.info(self.idstr() + " [terminate] thread still alive...")
+			log.info(self.idstr() + " [terminate] stop & join...")			
+			self.stop()
+			self._thread.join()
+			log.info(self.idstr() + "thread exited")
+			self._thread = None
+			log.info(self.idstr() + " state_off")
+			self.emit("state", strbool(False))
+			self.STATE = False
+			self.end_lock.release()			
+
+
 	def state_on(self, c):
 		
 		self.emit("state", strbool(True))
@@ -105,8 +122,8 @@ class Monitor:
 		# transit?
 		if self.EXIT:
 			# exit transition
-			self.STATE = False
-			self.stop()
+			self.terminate()
+			log.info(self.idstr() + " exit ")
 			return ("state_exit", None)
 		elif not self.STATE:
 			# off transition
@@ -137,8 +154,9 @@ class Monitor:
 
 		# transit?
 		if self.EXIT:
-			# exit transition
-			self.STATE = False
+			# exit transition			
+			self.terminate()
+			log.info(self.idstr() + " exit ")
 			return ("state_exit", None)
 		elif self.STATE:
 			# on transition

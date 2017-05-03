@@ -73,14 +73,14 @@ class Monitor:
 		time.sleep(2)
 
 	def state_on(self, c):
-
-		log.info(self.idstr() + " state_on")
+		
 		self.emit("state", strbool(True))
 
 		# on transition
 		if self.STATE and self._thread is None:
 			self._thread = threading.Thread(target=self.run, args=(self.config, self.status_cb, self.ends_cb))
 			self._thread.start()
+			log.info(self.idstr() + " state_on")
 			self.emit("state", strbool(True))
 
 		# transit?
@@ -98,8 +98,7 @@ class Monitor:
 			return ("state_on", None)
 
 	def state_off(self, c):
-
-		log.info(self.idstr() + " state_off")
+		
 		self.emit("state", strbool(False))
 
 		# on transition
@@ -113,6 +112,7 @@ class Monitor:
 				log.info(self.idstr() + "thread already terminated...")
 			log.info(self.idstr() + "thread exited")
 			self._thread = None
+			log.info(self.idstr() + " state_off")
 			self.emit("state", strbool(False))
 			self.end_lock.release()
 

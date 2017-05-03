@@ -1,4 +1,4 @@
-import os, platform, subprocess, time, json, logging, time
+import os, platform, subprocess, time, json, logging, time, signal
 from optparse import OptionParser
 from lib.monitor import Monitor
 import lib.log as log

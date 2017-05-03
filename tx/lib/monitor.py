@@ -28,6 +28,10 @@ class Monitor:
 
 		self.end_lock = threading.Lock()
 
+		self._c_state_signal = self.STATE
+		self._c_state_signal_time = 0
+
+
 	def register(self):
 
 		self._sb.addPublisher("monitor", "boolean")
@@ -47,8 +51,23 @@ class Monitor:
 			print e
 			pass
 
+	def is_time_to_log_signal(self, value):
+
+		if self._c_state_signal_time == 0 or self._c_state_signal != value:
+			self._c_state_signal_time = time.time()
+			self._c_state_signal = value
+			return True
+		elif self._c_state_signal == value and (time.time() - self._c_state_signal_time) > 60:
+			self._c_state_signal_time = time.time()
+			self._c_state_signal = value
+			return True
+		else:
+			self._c_state_signal = value
+			return False
+
 	def state_signal(self, value):
-		log.info(self.idstr() + " state_signal - " + str(value))		
+		if self.is_time_to_log_signal(value):
+			log.info(self.idstr() + " state_signal - " + str(value))		
 		with self.end_lock:
 			self.STATE = bool(value)
 
@@ -163,11 +182,11 @@ class Monitor:
 				if fsm_start_state_on:
 					self.STATE = True
 					m.set_start("state_on")
-					print "fsm start state_on"
+					log.info(self.idstr() + " start state_on")
 				else:
 					self.STATE = False
 					m.set_start("state_off")
-					print "fsm start state_off"
+					log.info(self.idstr() + " start state_off")
 				m.run(None)
 
 		except Exception as e:

@@ -1,4 +1,4 @@
-import os, threading, time, json, logging
+import os, threading, time, json, logging, signal
 from optparse import OptionParser
 from lib.monitor import Monitor
 import lib.log as log
@@ -28,6 +28,26 @@ def parse_config(options):
 		options.name = c['name']
 		options.server = c['server']	
 
+def handle_SIGTERM():
+    print "handle_SIGTERM"
+
+def handle_SIGINT():
+    print "handle_SIGINT"
+
+def handle_SIGSTOP():
+    print "handle_SIGSTOP"
+
+def handle_SIGHUP():
+    print "handle_SIGHUP"
+
+def handle_SIGKILL():
+    print "handle_SIGKILL"
+
+def handle_SIGQUIT():
+    print "handle_SIGKILL"    
+
+
+
 if __name__ == "__main__":
 
     p = OptionParser();
@@ -54,6 +74,13 @@ if __name__ == "__main__":
     if options.mnt is None:
     	p.print_help()
     	p.error('No mount point specified.')
+
+    signal.signal(signal.SIGTERM, handle_SIGTERM)
+    signal.signal(signal.SIGINT, handle_SIGINT)
+    #signal.signal(signal.SIGSTOP, handle_SIGSTOP)
+    signal.signal(signal.SIGHUP, handle_SIGHUP)
+    #signal.signal(signal.SIGKILL, handle_SIGKILL)
+    signal.signal(signal.SIGQUIT, handle_SIGQUIT)
 
     log.info("[rxmonitor] start - " + options.name)
 

@@ -91,7 +91,7 @@ class Monitor:
 	def stop(self):		
 		time.sleep(2)
 
-	def kill(self):
+	def exit(self):
 		self.EXIT = True
 
 	def terminate(self):
